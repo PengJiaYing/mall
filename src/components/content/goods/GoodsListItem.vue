@@ -1,6 +1,6 @@
 <template>
-  <div class="goods-item">
-    <img :src="goodsItem.show.img" alt="" @load="imageLoad" />
+  <div class="goods-item" @click="itemClick(goodsItem.iid)">
+    <img :src="showImage" alt="" @load="imageLoad" />
     <div class="goods-info">
       <p>{{ goodsItem.title }}</p>
       <span class="price">{{ goodsItem.price }}</span>
@@ -15,16 +15,24 @@ export default {
   props: {
     goodsItem: {
       type: Object,
-      default: null,
+      default: {},
     },
   },
-  methods:{
-    imageLoad(){
+  computed: {
+    showImage() {
+      return this.goodsItem.image || this.goodsItem.show.img;
+    },
+  },
+  methods: {
+    imageLoad() {
       // 监听图片加载完刷新重新计算height避免bug
       // 事件总线 非父子组件通信
-      this.$bus.$emit('itemImageLoad')
-    }
-  }
+      this.$bus.$emit("itemImageLoad");
+    },
+    itemClick() {
+      this.$router.push("/detail/" + this.goodsItem.iid);
+    },
+  },
 };
 </script>
 

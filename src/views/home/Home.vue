@@ -29,7 +29,7 @@
       ></tab-control>
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
-    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+    <back-top @click.native="backTop" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -42,10 +42,12 @@ import NavBar from "@/components/common/navbar/NavBar";
 import TabControl from "@/components/content/tabControl/TabControl";
 import GoodsList from "@/components/content/goods/GoodsList";
 import Scroll from "@/components/common/scroll/Scroll";
-import BackTop from "@/components/content/backTop/BackTop";
 
 import { getHomeMultidata, getHomeGoods } from "@/network/home";
-import { debounce } from "@/common/utils";
+import { itemListenerMixin,backTopMixin } from "@/common/mixin";
+import { BACK_POSITION } from "@/common/const";
+
+
 export default {
   name: "Home",
   components: {
@@ -57,8 +59,8 @@ export default {
     TabControl,
     GoodsList,
     Scroll,
-    BackTop,
   },
+  mixins: [itemListenerMixin,backTopMixin],
   data() {
     return {
       banners: [],
@@ -69,7 +71,6 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
-      isShowBackTop: true,
       tabOffsetTop: 0,
       isTabFixed: false,
     };
@@ -79,6 +80,9 @@ export default {
       return this.goods[this.currentType].list;
     },
   },
+  deactivated() {
+    this.$bus.$off("itemImageLoad", this.itemImgListener);
+  },
   created() {
     this.getHomeMultidata();
 
@@ -86,15 +90,7 @@ export default {
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
   },
-  mounted() {
-    const refresh = debounce(this.$refs.scroll.refresh, 200);
-    // 事件总线
-    this.$bus.$on("itemImageLoad", () => {
-      refresh();
-    });
-    // 图片未加载完成 数据有问题
-    // this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop;
-  },
+  mounted() {},
   methods: {
     // 数据请求
     getHomeMultidata() {
@@ -130,11 +126,9 @@ export default {
       this.$refs.tabControl1.currentType = index;
       this.$refs.tabControl2.currentType = index;
     },
-    backClick() {
-      this.$refs.scroll.scrollTo(0, 0);
-    },
+    
     contentScroll(position) {
-      this.isShowBackTop = -position.y > 1000;
+      this.isShowBackTop = -position.y > BACK_POSITION;
       this.isTabFixed = -position.y > this.tabOffsetTop;
     },
     loadMore() {
