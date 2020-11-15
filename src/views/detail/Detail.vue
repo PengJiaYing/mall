@@ -30,6 +30,7 @@
     </scroll>
     <detail-bottom-bar @addToCart="addToCart"></detail-bottom-bar>
     <back-top @click.native="backTop" v-show="isShowBackTop"></back-top>
+    <!-- <toast :message="message" :show="show"></toast> -->
   </div>
 </template>
 
@@ -45,7 +46,7 @@ import DetailBottomBar from "@/views/detail/childComps/DetailBottomBar";
 
 import Scroll from "@/components/common/scroll/Scroll";
 import GoodsList from "@/components/content/goods/GoodsList";
-
+// import Toast from "@/components/common/toast/Toast";
 import {
   getDetail,
   Goods,
@@ -70,6 +71,7 @@ export default {
     DetailBottomBar,
     Scroll,
     GoodsList,
+    // Toast,
   },
   mixins: [itemListenerMixin, backTopMixin],
   data() {
@@ -85,6 +87,8 @@ export default {
       themeTops: [],
       getThemeTop: null,
       currentIndex: 0,
+      // message: "",
+      // show: false,
     };
   },
   created() {
@@ -161,7 +165,17 @@ export default {
       product.iid = this.id;
       // this.$store.commit("addCart", product);
       // 返回promise
-      this.$store.dispatch("addCart", product);
+      this.$store.dispatch("addCart", product).then((res) => {
+        // console.log(res);
+        // this.show = true;
+        // this.message = res;
+        // setTimeout(() => {
+        //   this.show = false;
+        //   this.message = "";
+        // }, 2000);
+        // console.log("添加成功 在购物车等亲~");
+        this.$toast.showMsg(res);
+      });
     },
   },
 };

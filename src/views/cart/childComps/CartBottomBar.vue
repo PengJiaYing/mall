@@ -9,7 +9,7 @@
       <span>全选</span>
     </div>
     <div class="total-price">合计:￥{{ totalPrice }}</div>
-    <div class="calculate">结算</div>
+    <div class="calculate" @click="calcClick">结算</div>
   </div>
 </template>
 
@@ -22,11 +22,17 @@ export default {
     CheckButton,
   },
   computed: {
-    ...mapGetters(["totalPrice", "isSelectedAll"]),
+    ...mapGetters(["totalPrice", "isSelectedAll", "cartLength"]),
   },
   methods: {
     checkClick() {
       this.$store.dispatch("setSelectAll");
+    },
+    calcClick() {
+      if (!this.totalPrice) {
+        // console.log('请选择购买商品')
+        this.$toast.showMsg("请选择购买商品");
+      }
     },
   },
 };
